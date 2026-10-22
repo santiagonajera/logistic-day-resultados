@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Oceánica Internacional — Forecast de Importaciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --rail:#1E2125; --rail-2:#2A2E33; --rail-fg:#E9ECEF; --rail-muted:#8A8F96;
+  --bg:#EEF1F5; --card:#FFFFFF; --card-2:#F5F7FA; --line:#E1E6EC;
+  --fg:#1D1D1B; --muted:#6B7178;
+  --cyan:#00A3E0; --cyan-2:#4CC3EE; --cyan-soft:#DDF3FB; --ink:#0E4F6E;
+  --good:#13A89E; --warn:#F2A33A; --bad:#E8573F;
+  --shadow:0 1px 2px rgba(20,30,40,.05),0 6px 20px rgba(20,30,40,.06);
+  --f-display:'Sora',system-ui,sans-serif;
+  --f-body:'Manrope',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,monospace;
+  --r:16px; --rail-w:248px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:14.5px}
+h1,h2,h3{font-family:var(--f-display);margin:0}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.app{display:grid;grid-template-columns:var(--rail-w) minmax(0,1fr);min-height:100vh}
+.rail{background:var(--rail);color:var(--rail-fg);position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:20px 16px;gap:18px;overflow-y:auto}
+.rail .brand img{display:block;width:100%;max-width:190px;height:auto}
+.client{background:#fff;border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.client img{width:100%;max-width:170px;height:auto}
+.client span{font-size:11px;color:#6B7178;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.main{min-width:0;padding:22px clamp(16px,2.6vw,32px) 40px}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.top h1{font-size:clamp(24px,2.8vw,32px);font-weight:700}
+.top h1 b{color:var(--cyan)}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px;margin-top:18px}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:18px 20px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.card .ttl{font-size:13px;font-weight:700;color:var(--muted)}
+.s4{grid-column:span 4}.s6{grid-column:span 6}.s8{grid-column:span 8}.s12{grid-column:span 12}
+.kpi .v{font-family:var(--f-display);font-size:34px;font-weight:600;line-height:1.05}
+.note{font-size:12.5px;color:var(--muted);background:var(--card-2);border-radius:10px;padding:9px 12px;margin-top:4px}
+.cv{position:relative;height:260px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--cyan-soft);color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand"><img src="assets/datachaindesign.jpg" alt="DataChainDesign"></div>
+    <div class="client">
+      <img src="assets/oceanica.webp" alt="Oceánica Internacional">
+      <span>Forecast · Importaciones</span>
+    </div>
+    <div style="margin-top:auto;font-size:11.5px;color:var(--rail-muted);line-height:1.45;border-top:1px solid var(--rail-2);padding-top:14px">
+      Agentes Logistic Day<br>Demo en vivo · Resultados precomputados
+    </div>
+  </aside>
+  <main class="main">
+    <div class="top">
+      <div>
+        <div class="hello" style="color:var(--muted);font-size:14px">Oceánica Internacional · Nicaragua</div>
+        <h1>Forecast de <b>Importaciones</b></h1>
+      </div>
+      <div class="pill">53.193 envíos · ene-2016 a ago-2026</div>
+    </div>
+
+    <div class="grid">
+      <article class="card s4 kpi">
+        <div class="ttl">WMAPE promedio</div>
+        <div class="v num" style="color:var(--cyan)">12.4%</div>
+        <div class="d">Selección automática por AIC · 10 modelos</div>
+      </article>
+      <article class="card s4 kpi">
+        <div class="ttl">Series evaluadas</div>
+        <div class="v num">25</div>
+        <div class="d">10 categorías + top 10 clientes</div>
+      </article>
+      <article class="card s4 kpi">
+        <div class="ttl">Modelo más frecuente</div>
+        <div class="v num">Holt-Winters</div>
+        <div class="d">Aditivo / multiplicativo</div>
+      </article>
+
+      <article class="card s8">
+        <div class="ttl">Volumen mensual histórico vs forecast</div>
+        <div class="cv"><canvas id="cMain"></canvas></div>
+        <div class="note">Serie agregada de importaciones. Los últimos 12 meses son predicción del modelo ganador por categoría.</div>
+      </article>
+      <article class="card s4">
+        <div class="ttl">Ganadores por categoría</div>
+        <div id="ranking" style="font-size:13px;line-height:1.6"></div>
+      </article>
+    </div>
+  </main>
+</div>
+
+<script>
+// Datos de ejemplo (reemplazar con forecast_resultados.json en vivo)
+const demo = {
+  labels: ['ene-24','feb-24','mar-24','abr-24','may-24','jun-24','jul-24','ago-24','sep-24','oct-24','nov-24','dic-24','ene-25','feb-25','mar-25','abr-25','may-25','jun-25','jul-25','ago-25'],
+  real: [4200,4100,4500,4300,4800,5100,4900,5200,5000,5300,5500,5800,null,null,null,null,null,null,null,null],
+  pred: [null,null,null,null,null,null,null,null,null,null,null,null,5400,5600,5700,5900,6100,6200,6400,6500]
+};
+const ctx = document.getElementById('cMain').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: demo.labels,
+    datasets: [
+      {label:'Histórico', data:demo.real, borderColor:'#00A3E0', backgroundColor:'rgba(0,163,224,.1)', fill:true, tension:.4, borderWidth:2.5, pointRadius:0},
+      {label:'Forecast', data:demo.pred, borderColor:'#13A89E', borderDash:[6,4], tension:.4, borderWidth:2.5, pointRadius:0}
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom'}},
+    scales:{y:{beginAtZero:false}, x:{ticks:{maxRotation:0, autoSkip:true, maxTicksLimit:8}}}
+  }
+});
+
+document.getElementById('ranking').innerHTML = `
+  <div><b>Textiles</b> · Holt-Winters aditivo · 11.2%</div>
+  <div><b>Electrónica</b> · SARIMA · 9.8%</div>
+  <div><b>Maquinaria</b> · Croston · 18.4%</div>
+  <div><b>Plásticos</b> · Holt · 13.1%</div>
+  <div><b>Alimentos</b> · Theta · 10.5%</div>
+  <div style="margin-top:8px;color:var(--muted)">WMAPE por serie · AIC para selección</div>
+`;
+</script>
+</body>
+</html>
